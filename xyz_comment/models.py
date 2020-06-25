@@ -12,7 +12,7 @@ class Comment(models.Model):
         ordering = ('-create_time', )
 
     user = models.ForeignKey("auth.User", on_delete=models.SET_NULL, null=True, related_name="comments")
-    content_type = models.ForeignKey(ContentType, null=True, on_delete=models.CASCADE)
+    content_type = models.ForeignKey(ContentType, verbose_name=ContentType._meta.verbose_name, null=True, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField(null=True)
     content_object = GenericForeignKey('content_type', 'object_id')
     object_name = models.CharField("名称", max_length=256, db_index=True, null=True, blank=True)
@@ -21,6 +21,7 @@ class Comment(models.Model):
     anchor = models.CharField("锚点", max_length=256, blank=True, null=True)
     create_time = models.DateTimeField("创建时间", auto_now_add=True, db_index=True)
     is_active = models.BooleanField("有效", default=True)
+    reply_count = models.PositiveIntegerField('回贴数', blank=True, default=0, editable=False)
 
     def save(self, **kwargs):
         if not self.object_name:

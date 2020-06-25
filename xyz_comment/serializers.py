@@ -8,5 +8,17 @@ class CommentSerializer(IDAndStrFieldSerializerMixin,  serializers.ModelSerializ
     user_name = serializers.CharField(source="user.get_full_name", label='用户名', read_only=True)
     class Meta:
         model = models.Comment
-        fields = ('content_type', 'object_id', 'object_name', 'user', 'user_name', 'content', 'context', 'anchor', 'is_active', 'create_time')
+        fields = (
+            'content_type',
+            'object_id',
+            'object_name',
+            'user',
+            'user_name',
+            'content',
+            'context',
+            'anchor',
+            'is_active',
+            'create_time',
+            'reply_count'
+        )
         read_only_fields = ('user', 'create_time', 'object_name')
