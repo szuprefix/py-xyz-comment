@@ -60,7 +60,7 @@ class FavoriteViewSet(UserApiMixin, viewsets.ModelViewSet):
         elif request.method == 'POST':
             if not f:
                 qd['content_type'] = ContentType.objects.get(id=qd['content_type'])
-                f = models.Favorite(party=self.party, **qd)
+                f = models.Favorite(**qd)
             d = request.data
             f.notes[d['anchor']] = d
             f.save()
