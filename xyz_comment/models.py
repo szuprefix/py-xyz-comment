@@ -12,8 +12,8 @@ class Comment(models.Model):
         ordering = ('-create_time', )
 
     user = models.ForeignKey("auth.User", on_delete=models.SET_NULL, null=True, related_name="comments")
-    content_type = models.ForeignKey(ContentType, verbose_name=ContentType._meta.verbose_name, null=True, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField(null=True)
+    content_type = models.ForeignKey(ContentType, verbose_name=ContentType._meta.verbose_name, null=True, on_delete=models.PROTECT)
+    object_id = models.PositiveIntegerField(null=True, db_index=True)
     content_object = GenericForeignKey('content_type', 'object_id')
     object_name = models.CharField("名称", max_length=256, db_index=True, null=True, blank=True)
     content = models.TextField("内容")
@@ -29,14 +29,21 @@ class Comment(models.Model):
         return super(Comment, self).save(**kwargs)
 
     def __unicode__(self):
-        return "%s 评论 %s" % (self.user.get_full_name(), self.content_object)
+        return "%s 评论 %s" % (self.user.get_full_name(), self.object_name)
 
+    @property
+    def replies(self):
+        from django.contrib.contenttypes.models import ContentType
+        ct = ContentType.objects.get_for_model(Comment)
+        qs = Comment.objects.filter(content_type=ct, object_id=self.id)
+        return qs
 
 
 class Favorite(models.Model):
     class Meta:
         verbose_name_plural = verbose_name = "收藏"
         ordering = ('-create_time',)
+        unique_together = ('user', 'content_type', 'object_id')
 
     user = models.ForeignKey("auth.User", on_delete=models.SET_NULL, null=True, related_name="comment_favorites")
     content_type = models.ForeignKey(ContentType, null=True, on_delete=models.PROTECT)

@@ -39,7 +39,8 @@ class FavoriteSerializer(IDAndStrFieldSerializerMixin, serializers.ModelSerializ
             'user_name',
             'notes',
             'is_active',
-            'create_time'
+            'create_time',
+            'notes_count'
         )
         read_only_fields = ('user', 'create_time', 'object_name')
 

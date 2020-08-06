@@ -32,6 +32,12 @@ class CommentViewSet(UserApiMixin, viewsets.ModelViewSet):
             return qset.exclude(content_type=ContentType.objects.get_for_model(models.Comment))
         return qset
 
+    @decorators.detail_route(['GET'])
+    def replies(self, request, pk):
+        c = self.get_object()
+        page = self.paginate_queryset(c.replies)
+        serializer = serializers.CommentSerializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
 @register()
 class FavoriteViewSet(UserApiMixin, viewsets.ModelViewSet):
@@ -60,9 +66,9 @@ class FavoriteViewSet(UserApiMixin, viewsets.ModelViewSet):
         elif request.method == 'POST':
             if not f:
                 qd['content_type'] = ContentType.objects.get(id=qd['content_type'])
-                f = models.Favorite(**qd)
+                f = models.Favorite(notes={}, **qd)
             d = request.data
-            f.notes[d['anchor']] = d
+            f.notes[unicode(d['anchor'])] = d
             f.save()
         return response.Response(self.get_serializer_class()(f).data)
 
