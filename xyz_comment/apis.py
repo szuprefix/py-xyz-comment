@@ -77,3 +77,70 @@ class FavoriteViewSet(UserApiMixin, viewsets.ModelViewSet):
     def stat(self, request):
         return do_rest_stat_action(self, stats.stats_favorite)
 
+
+@register()
+class RatingViewSet(UserApiMixin, viewsets.ModelViewSet):
+    serializer_class = serializers.RatingSerializer
+    queryset = models.Rating.objects.all()
+    filter_fields = {
+        'content_type__app_label': ['exact'],
+        'content_type__model': ['exact'],
+        'content_type': ['exact'],
+        'object_id': ['exact'],
+        'user': ['exact']
+    }
+
+    @decorators.list_route(['GET', 'POST'], permission_classes=[permissions.IsAuthenticated])
+    def record(self, request):
+        qs = request.query_params
+        qp = request.data
+        if not qs.get('content_type'):
+            raise exceptions.ValidationError('content_type should not be empty.')
+        if not qs.get('object_id'):
+            raise exceptions.ValidationError('object_id should not be empty.')
+        qd = dict(user=request.user, content_type=qs.get('content_type'), object_id=qs.get('object_id'))
+        r = self.get_queryset().filter(**qd).first()
+        if not r:
+            if request.method == 'POST':
+                qd['content_type'] = ContentType.objects.get(id=qd['content_type'])
+                qd['stars'] = qp['stars']
+                qd['content'] = qp['content']
+                r = models.Rating(**qd)
+                r.save()
+                data = self.get_serializer_class()(r).data
+            else:
+                data = qs
+        else:
+            if request.method == 'POST':
+                r.stars = qp['stars']
+                r.content = qp['content']
+                r.save()
+            data = self.get_serializer_class()(r).data
+        sumary = models.RatingSumary.objects.filter(content_type_id=qd['content_type'], object_id=qd['object_id']).first()
+        if sumary:
+            data['sumary'] = serializers.RatingSumarySerializer(sumary).data
+        return response.Response(data)
+
+@register()
+class RatingSumaryViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = serializers.RatingSumarySerializer
+    queryset = models.RatingSumary.objects.all()
+    #
+    #
+    # @decorators.list_route(['GET'])
+    # def record(self, request):
+    #     qs = request.query_params
+    #     if not qs.get('content_type'):
+    #         raise exceptions.ValidationError('content_type should not be empty.')
+    #     if not qs.get('object_id'):
+    #         raise exceptions.ValidationError('object_id should not be empty.')
+    #     qd = dict(content_type=qs.get('content_type'), object_id=qs.get('object_id'))
+    #     r = self.get_queryset().filter(**qd).first()
+    #     if not r:
+    #         return response.Response(qs)
+    #     data = self.get_serializer_class()(r).data
+    #     qd['user'] = request.user
+    #     mr = models.Rating.objects.filter(qd).first()
+    #     if mr:
+    #         data['mine'] =serializers.RatingSerializer(mr).data
+    #     return response.Response(data)

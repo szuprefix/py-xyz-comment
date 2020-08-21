@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*-
+from __future__ import division
 from django.contrib.contenttypes.models import ContentType
 from django.dispatch import receiver
 from . import models
@@ -40,3 +41,20 @@ def update_comment_reply_count_after_delete(sender, **kwargs):
         import traceback
         log.error('receiver update_comment_reply_count error: %s', traceback.format_exc())
 
+
+@receiver(post_save, sender=models.Rating)
+def update_rating_sumary_after_save(sender, **kwargs):
+    rating = kwargs.pop('instance')
+    qset = models.Rating.objects.filter(content_type=rating.content_type, object_id=rating.object_id)
+    from django.db.models import Sum, Count
+    agg = qset.aggregate(stars=Sum('stars'), user_count=Count(1))
+    score = agg['stars'] * 2 / agg['user_count']
+    models.RatingSumary.objects.update_or_create(
+        content_type=rating.content_type,
+        object_id=rating.object_id,
+        defaults=dict(
+            score=score,
+            user_count=agg['user_count'],
+            detail={}
+        )
+    )

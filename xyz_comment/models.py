@@ -66,3 +66,44 @@ class Favorite(models.Model):
 
     def __unicode__(self):
         return "%s 收藏 %s" % (self.user.get_full_name(), self.object_name)
+
+
+class Rating(models.Model):
+    class Meta:
+        verbose_name_plural = verbose_name = "评分"
+        ordering = ('-create_time',)
+
+    user = models.ForeignKey("auth.User", on_delete=models.PROTECT, null=True, related_name="comment_ratings")
+    content_type = models.ForeignKey(ContentType, null=True, on_delete=models.PROTECT)
+    object_id = models.PositiveIntegerField(null=True, db_index=True)
+    content_object = GenericForeignKey('content_type', 'object_id')
+    object_name = models.CharField("名称", max_length=256, db_index=True, null=True, blank=True)
+    stars = models.PositiveSmallIntegerField('评分', default=0, blank=True)
+    content = models.TextField("内容", blank=True, default='')
+    create_time = models.DateTimeField("创建时间", auto_now_add=True, db_index=True)
+    update_time = models.DateTimeField("修改时间", auto_now=True)
+
+    def save(self, **kwargs):
+        if not self.object_name:
+            self.object_name = unicode(self.content_object)
+        return super(Rating, self).save(**kwargs)
+
+
+class RatingSumary(models.Model):
+    class Meta:
+        verbose_name_plural = verbose_name = "评分汇总"
+
+    content_type = models.ForeignKey(ContentType, null=True, on_delete=models.PROTECT)
+    object_id = models.PositiveIntegerField(null=True, db_index=True)
+    content_object = GenericForeignKey('content_type', 'object_id')
+    object_name = models.CharField("名称", max_length=256, db_index=True, null=True, blank=True)
+    score = models.DecimalField('评分', max_digits=3, decimal_places=1, default=0, blank=True)
+    user_count = models.PositiveSmallIntegerField('参与人数', default=0, blank=True)
+    detail = modelutils.JSONField('详情', default={}, blank=True)
+    create_time = models.DateTimeField("创建时间", auto_now_add=True, db_index=True)
+    update_time = models.DateTimeField("修改时间", auto_now=True)
+
+    def save(self, **kwargs):
+        if not self.object_name:
+            self.object_name = unicode(self.content_object)
+        return super(RatingSumary, self).save(**kwargs)
