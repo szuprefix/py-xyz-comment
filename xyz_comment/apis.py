@@ -104,7 +104,7 @@ class RatingViewSet(UserApiMixin, viewsets.ModelViewSet):
             if request.method == 'POST':
                 qd['content_type'] = ContentType.objects.get(id=qd['content_type'])
                 qd['stars'] = qp['stars']
-                qd['content'] = qp['content']
+                qd['content'] = qp.get('content', '')
                 r = models.Rating(**qd)
                 r.save()
                 data = self.get_serializer_class()(r).data
@@ -113,7 +113,7 @@ class RatingViewSet(UserApiMixin, viewsets.ModelViewSet):
         else:
             if request.method == 'POST':
                 r.stars = qp['stars']
-                r.content = qp['content']
+                r.content = qp.get('content', '')
                 r.save()
             data = self.get_serializer_class()(r).data
         sumary = models.RatingSumary.objects.filter(content_type_id=qd['content_type'], object_id=qd['object_id']).first()
