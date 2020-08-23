@@ -88,6 +88,8 @@ class Rating(models.Model):
             self.object_name = unicode(self.content_object)
         return super(Rating, self).save(**kwargs)
 
+    def __unicode__(self):
+        return "%s 评分 %s" % (self.user.get_full_name(), self.object_name)
 
 class RatingSumary(models.Model):
     class Meta:
