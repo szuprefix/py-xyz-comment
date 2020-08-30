@@ -8,7 +8,7 @@ from xyz_util.statutils import do_rest_stat_action
 from . import serializers, models, stats
 from rest_framework import viewsets, exceptions, response, decorators, permissions
 from xyz_restful.decorators import register
-
+from copy import deepcopy
 __author__ = 'denishuang'
 
 
@@ -109,7 +109,7 @@ class RatingViewSet(UserApiMixin, viewsets.ModelViewSet):
                 r.save()
                 data = self.get_serializer_class()(r).data
             else:
-                data = qs
+                data = deepcopy(qs)
         else:
             if request.method == 'POST':
                 r.stars = qp['stars']
