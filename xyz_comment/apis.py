@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.contrib.contenttypes.models import ContentType
+from rest_framework.permissions import IsAuthenticated
 from xyz_restful.mixins import UserApiMixin
 from xyz_util.statutils import do_rest_stat_action
 
@@ -43,7 +44,7 @@ class CommentViewSet(UserApiMixin, viewsets.ModelViewSet):
 class FavoriteViewSet(UserApiMixin, viewsets.ModelViewSet):
     serializer_class = serializers.FavoriteSerializer
     queryset = models.Favorite.objects.all()
-    permission_classes = []
+    permission_classes = [IsAuthenticated]
     filter_fields = {
         'content_type': ['exact'],
         'object_id': ['exact', 'in'],
