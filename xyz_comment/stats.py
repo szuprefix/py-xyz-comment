@@ -5,10 +5,10 @@ from . import models
 from xyz_util import statutils
 from django.db.models import Sum
 
-def stats_favorite(qset=None, measures=None, period=None):
+def stats_favorite(qset=None, measures=None, period=None, time_field=None):
     qset = qset if qset is not None else models.Fault.objects.all()
     qset = statutils.using_stats_db(qset)
-    dstat = statutils.DateStat(qset, 'create_time')
+    dstat = statutils.DateStat(qset, time_field or 'create_time')
     funcs = {
         'today': lambda: dstat.stat("今天", count_field="user_id", distinct=True, only_first=True),
         'count': lambda: dstat.get_period_query_set(period).count(),
