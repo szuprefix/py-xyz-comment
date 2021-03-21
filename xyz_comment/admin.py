@@ -19,6 +19,6 @@ class FavoriteAdmin(admin.ModelAdmin):
 @admin.register(models.Rating)
 class RatingAdmin(admin.ModelAdmin):
     search_fields = ('object_name', )
-    list_display = ("update_time", "user", "content_type", "object_name", 'stars')
+    list_display = ("update_time", "user", "content_type", "object_name", 'stars', 'content')
     readonly_fields = ("create_time", "update_time", 'user')
     raw_id_fields = ('content_type',)

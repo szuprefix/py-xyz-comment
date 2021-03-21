@@ -25,6 +25,7 @@ class CommentViewSet(UserApiMixin, viewsets.ModelViewSet):
         'create_time': ['range'],
         'reply_count': ['gte', 'lte']
     }
+    search_fields = ['object_name']
 
     def filter_queryset(self, queryset):
         qset = super(CommentViewSet, self).filter_queryset(queryset)
@@ -88,8 +89,11 @@ class RatingViewSet(UserApiMixin, viewsets.ModelViewSet):
         'content_type__model': ['exact'],
         'content_type': ['exact'],
         'object_id': ['exact'],
+        'create_time': ['range'],
         'user': ['exact']
     }
+    search_fields = ['object_name']
+    ordering_fields = ['stars']
 
     @decorators.list_route(['GET', 'POST'], permission_classes=[permissions.IsAuthenticated])
     def record(self, request):

@@ -74,7 +74,7 @@ class Rating(models.Model):
         ordering = ('-create_time',)
 
     user = models.ForeignKey("auth.User", on_delete=models.PROTECT, null=True, related_name="comment_ratings")
-    content_type = models.ForeignKey(ContentType, null=True, on_delete=models.PROTECT)
+    content_type = models.ForeignKey(ContentType, verbose_name=ContentType._meta.verbose_name, null=True, on_delete=models.PROTECT)
     object_id = models.PositiveIntegerField(null=True, db_index=True)
     content_object = GenericForeignKey('content_type', 'object_id')
     object_name = models.CharField("名称", max_length=256, db_index=True, null=True, blank=True)
