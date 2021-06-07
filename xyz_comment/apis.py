@@ -34,7 +34,7 @@ class CommentViewSet(UserApiMixin, viewsets.ModelViewSet):
             return qset.exclude(content_type=ContentType.objects.get_for_model(models.Comment))
         return qset
 
-    @decorators.detail_route(['GET'])
+    @decorators.action(['GET'], detail=True)
     def replies(self, request, pk):
         c = self.get_object()
         page = self.paginate_queryset(c.replies)
@@ -53,7 +53,7 @@ class FavoriteViewSet(UserApiMixin, viewsets.ModelViewSet):
         'create_time': ['range']
     }
 
-    @decorators.list_route(['GET', 'POST'])
+    @decorators.action(['GET', 'POST'], detail=False)
     def record(self, request):
         qs = request.query_params
         if not qs.get('content_type'):
@@ -75,7 +75,7 @@ class FavoriteViewSet(UserApiMixin, viewsets.ModelViewSet):
         return response.Response(self.get_serializer_class()(f).data)
 
 
-    @decorators.list_route(['get'])
+    @decorators.action(['get'], detail=False)
     def stat(self, request):
         return do_rest_stat_action(self, stats.stats_favorite)
 
@@ -95,7 +95,7 @@ class RatingViewSet(UserApiMixin, viewsets.ModelViewSet):
     search_fields = ['object_name']
     ordering_fields = ['stars']
 
-    @decorators.list_route(['GET', 'POST'], permission_classes=[permissions.IsAuthenticated])
+    @decorators.action(['GET', 'POST'], detail=False, permission_classes=[permissions.IsAuthenticated])
     def record(self, request):
         qs = request.query_params
         qp = request.data
@@ -132,7 +132,7 @@ class RatingSumaryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.RatingSumary.objects.all()
     #
     #
-    # @decorators.list_route(['GET'])
+    # @decorators.action(['GET'], detail=False)
     # def record(self, request):
     #     qs = request.query_params
     #     if not qs.get('content_type'):
