@@ -22,7 +22,7 @@ def update_comment_reply_count(sender, **kwargs):
             return
         c = int(models.Comment.objects.filter(content_type_id=ctid, object_id=comment.object_id).count())
         models.Comment.objects.filter(id=comment.object_id).update(reply_count=c)
-    except Exception, e:
+    except Exception as e:
         import traceback
         log.error('receiver update_comment_reply_count error: %s', traceback.format_exc())
 
@@ -37,7 +37,7 @@ def update_comment_reply_count_after_delete(sender, **kwargs):
     try:
         c = int(models.Comment.objects.filter(content_type_id=ctid, object_id=comment.object_id).count())
         models.Comment.objects.filter(id=comment.object_id).update(reply_count=c)
-    except Exception, e:
+    except Exception as e:
         import traceback
         log.error('receiver update_comment_reply_count error: %s', traceback.format_exc())
 
