@@ -58,7 +58,7 @@ class Favorite(models.Model):
 
     def save(self, **kwargs):
         if not self.object_name:
-            self.object_name = unicode(self.content_object)
+            self.object_name = text_type(self.content_object)
         if not self.notes:
             self.notes = {}
         self.notes_count = len([n for n in self.notes.values() if n['is_active']])
@@ -86,7 +86,7 @@ class Rating(models.Model):
 
     def save(self, **kwargs):
         if not self.object_name:
-            self.object_name = unicode(self.content_object)
+            self.object_name = text_type(self.content_object)
         return super(Rating, self).save(**kwargs)
 
     def __unicode__(self):
@@ -109,5 +109,5 @@ class RatingSumary(models.Model):
 
     def save(self, **kwargs):
         if not self.object_name:
-            self.object_name = unicode(self.content_object)
+            self.object_name = text_type(self.content_object)
         return super(RatingSumary, self).save(**kwargs)
