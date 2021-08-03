@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from six import text_type
 from xyz_util import modelutils
 
 class Comment(models.Model):
@@ -25,7 +26,7 @@ class Comment(models.Model):
 
     def save(self, **kwargs):
         if not self.object_name:
-            self.object_name = unicode(self.content_object)
+            self.object_name = text_type(self.content_object)
         return super(Comment, self).save(**kwargs)
 
     def __unicode__(self):
@@ -94,6 +95,7 @@ class Rating(models.Model):
 class RatingSumary(models.Model):
     class Meta:
         verbose_name_plural = verbose_name = "评分汇总"
+        unique_together = ('content_type', 'object_id')
 
     content_type = models.ForeignKey(ContentType, null=True, on_delete=models.PROTECT)
     object_id = models.PositiveIntegerField(null=True, db_index=True)

@@ -3,12 +3,14 @@ from __future__ import unicode_literals
 
 from django.contrib.contenttypes.models import ContentType
 from rest_framework.permissions import IsAuthenticated
+from six import text_type
 from xyz_restful.mixins import UserApiMixin
 from xyz_util.statutils import do_rest_stat_action
 
 from . import serializers, models, stats
 from rest_framework import viewsets, exceptions, response, decorators, permissions
 from xyz_restful.decorators import register
+from xyz_util.statutils import smart_rest_stat_action
 from copy import deepcopy
 __author__ = 'denishuang'
 
@@ -70,7 +72,7 @@ class FavoriteViewSet(UserApiMixin, viewsets.ModelViewSet):
                 qd['content_type'] = ContentType.objects.get(id=qd['content_type'])
                 f = models.Favorite(notes={}, **qd)
             d = request.data
-            f.notes[unicode(d['anchor'])] = d
+            f.notes[text_type(d['anchor'])] = d
             f.save()
         return response.Response(self.get_serializer_class()(f).data)
 
@@ -130,6 +132,14 @@ class RatingViewSet(UserApiMixin, viewsets.ModelViewSet):
 class RatingSumaryViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.RatingSumarySerializer
     queryset = models.RatingSumary.objects.all()
+    filter_fields = {
+        'content_type': ['exact'],
+        'object_id': ['exact', 'in']
+    }
+
+    @decorators.action(['get'], detail=False)
+    def smart_stat(self, request):
+        return smart_rest_stat_action(self)
     #
     #
     # @decorators.action(['GET'], detail=False)
