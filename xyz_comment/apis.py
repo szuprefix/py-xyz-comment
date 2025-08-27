@@ -20,7 +20,7 @@ class CommentViewSet(UserApiMixin, viewsets.ModelViewSet):
     serializer_class = serializers.CommentSerializer
     queryset = models.Comment.objects.all()
     permission_classes = [permissions.IsAuthenticated]
-    filter_fields = {
+    filterset_fields = {
         'content_type': ['exact'],
         'object_id': ['exact'],
         'user': ['exact'],
@@ -48,7 +48,7 @@ class FavoriteViewSet(UserApiMixin, viewsets.ModelViewSet):
     serializer_class = serializers.FavoriteSerializer
     queryset = models.Favorite.objects.all()
     permission_classes = [IsAuthenticated]
-    filter_fields = {
+    filterset_fields = {
         'content_type': ['exact'],
         'object_id': ['exact', 'in'],
         'user': ['exact'],
@@ -86,7 +86,7 @@ class FavoriteViewSet(UserApiMixin, viewsets.ModelViewSet):
 class RatingViewSet(UserApiMixin, viewsets.ModelViewSet):
     serializer_class = serializers.RatingSerializer
     queryset = models.Rating.objects.all()
-    filter_fields = {
+    filterset_fields = {
         'content_type__app_label': ['exact'],
         'content_type__model': ['exact'],
         'content_type': ['exact'],
@@ -132,7 +132,7 @@ class RatingViewSet(UserApiMixin, viewsets.ModelViewSet):
 class RatingSumaryViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.RatingSumarySerializer
     queryset = models.RatingSumary.objects.all()
-    filter_fields = {
+    filterset_fields = {
         'content_type': ['exact'],
         'object_id': ['exact', 'in']
     }
